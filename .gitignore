@@ -35,3 +35,4 @@ logs/
 !outputs/**/wrong_predictions.csv
 !outputs/**/training_log.csvsrc/skeleton/BlockGCN/
 src/skeleton/CTR-GCN/
+outputs/**/*.mp4
