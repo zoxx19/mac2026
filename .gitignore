@@ -33,4 +33,5 @@ logs/
 !outputs/**/evaluation/
 !outputs/**/confusion_matrix.png
 !outputs/**/wrong_predictions.csv
-!outputs/**/training_log.csv
+!outputs/**/training_log.csvsrc/skeleton/BlockGCN/
+src/skeleton/CTR-GCN/
