@@ -1,10 +1,10 @@
-# MA-52 Multi-Track Action Recognition
+# MA-52 Multi-Track Micro-Action Recognition
 
-A multi-track action recognition pipeline for the MA-52 micro-action dataset, developed for the **Micro-Action Analysis Grand Challenge (MAC 2026)**.
+A multi-track action recognition pipeline for the **MA-52** micro-action dataset, developed for the [Micro-Action Analysis Grand Challenge (MAC 2026)](https://sites.google.com/view/micro-action).
 
 ## Overview
 
-MA-52 contains 22,422 videos across 52 fine-grained micro-action classes from 7 body-part categories, collected from 205 subjects in professional psychological interviews. This pipeline builds separate recognition models per body-part track and fuses their outputs for final classification.
+MA-52 contains 22,422 videos across 52 fine-grained micro-action classes from 7 body-part categories, collected from 205 subjects in professional psychological interviews. This pipeline builds **separate recognition models per body-part track**.
 
 **Competition metric:**
 ```
@@ -15,209 +15,178 @@ F1-mean = (F1-macro + F1-micro) / 2
 
 ## Dataset
 
-| Split | Videos | Classes |
+| Split | Videos | Duration |
 |---|---|---|
-| Train | 11,250 | 52 fine / 7 coarse |
-| Val | 5,586 | 52 fine / 7 coarse |
-| Test | 5,586 | hidden |
+| Train | 11,250 | 6.19h |
+| Val | 5,586 | 3.05h |
+| Test | 1,138 | hidden |
 
-Videos: 900×1080, 30fps, ~2.8s each.
+Videos: 900×1080px, 30fps, ~2.8s average.
 
-### Fine → Coarse mapping
-| Coarse | Body part | Fine labels |
-|---|---|---|
-| 0 | Body (A) | A1–A5 (fine 0–4) |
-| 1 | Head (B) | B1–B6 (fine 5–10) |
-| 2 | Upper limb (C) | C1–C13 (fine 11–23) |
-| 3 | Lower limb (D) | D1–D8 (fine 24–31) |
-| 4 | Body-hand (E) | E1–E6 (fine 32–37) |
-| 5 | Head-hand (F) | F1–F10 (fine 38–47) |
-| 6 | Leg-hand (G) | G1–G4 (fine 48–51) |
+### Fine → Coarse Mapping
+| Coarse | Body Part | Fine Labels | Classes |
+|---|---|---|---|
+| 0 | Body (A) | fine 0–4 | A1–A5 |
+| 1 | Head (B) | fine 5–10 | B1–B6 |
+| 2 | Upper limb (C) | fine 11–23 | C1–C13 |
+| 3 | Lower limb (D) | fine 24–31 | D1–D8 |
+| 4 | Body-hand (E) | fine 32–37 | E1–E6 |
+| 5 | Head-hand (F) | fine 38–47 | F1–F10 |
+| 6 | Leg-hand (G) | fine 48–51 | G1–G4 |
 
 ---
 
-## Tracks
+## Results Summary
 
-| Track | Input | Model | Classes | Best F1-mean |
+| Track | Input | Model | Classes | F1-mean |
 |---|---|---|---|---|
-| Head (B) | RGB head crop 224×224 | VideoMAE-base SSv2 | B1–B6 + B7 | ✅ **0.7769** |
-| Hand (C/E/F/G) | Skeleton keypoints | MMN ensemble J+B | C, E, F, G + no-hand (5) | ✅ **0.7533** |
-| Leg (D) | Skeleton keypoints | MMN joint aug | D1–D8 + D9 no-leg (9) | ✅ **0.5733** |
-| Body (A) | Skeleton keypoints | MMN joint aug | A1–A5 + A6 no-body (6) | ✅ **0.6234** |
+| Head (B) | RGB head crop 224×224 | VideoMAE-base SSv2 | B1–B7 | **0.7769** |
+| Hand (C/E/F/G) | Skeleton keypoints | MMN ensemble (joint+bone) | 5 coarse | **0.7533** |
+| Hand fine-grained | RGB upper body + Skeleton | VideoMAE + MMN fusion | 34 fine | **0.3066** |
+| Body (A) | Skeleton keypoints | MMN joint aug | A1–A5 + no-body | **0.6154** |
+| Leg (D) | Skeleton keypoints | MMN joint aug | D1–D8 + no-leg | **0.4778** |
 
 ---
 
-## Results
+## Track 1 — Head Recognition (B1–B7)
 
-### Track 1 — Head Recognition (B1–B7)
+**Input:** 224×224 head crop, 16 frames uniformly sampled  
+**Model:** VideoMAE-base pretrained on Something-Something-v2, fine-tuned  
+**Best model:** `outputs/head_best_run1/best_model.pt`
 
 | Run | Model | Notes | F1-mean |
 |---|---|---|---|
 | **Run 1 ✅ Best** | VideoMAE-base SSv2 | Baseline | **0.7769** |
 | Run 2A | VideoMAE-base SSv2 | + Weighted loss | 0.7570 |
 | Run 2B | VideoMAE-base Kinetics | + Weighted loss | 0.7676 |
-| Run 3A | VideoMAE-base SSv2 | + Dropout + augmentation | 0.6408 |
-| Run 3B | TimeSformer-base K400 | + Dropout + augmentation | 0.5167 |
+| Run 3A | VideoMAE-base SSv2 | + Dropout + aug | 0.6408 |
+| Run 3B | TimeSformer K400 | + Dropout + aug | 0.5167 |
 | Run 4A | VideoMAE-base Kinetics | Same as Run 1 | 0.6893 |
 | Run 4C | VideoMAE-base Kinetics | + Dynamic crop | 0.7098 |
 
-**Best model:** `outputs/head_best_run1/best_model.pt`
-
-#### Per-class performance (val set)
-| Class | F1 | Support |
+**Per-class (val):**
+| Class | Description | F1 |
 |---|---|---|
-| B1 nodding | 0.66 | 168 |
-| B2 shaking head | 0.59 | 121 |
-| B3 turning head | 0.50 | 228 |
-| B4 tilting head | 0.69 | 480 |
-| B5 bowing head | 0.84 | 641 |
-| B6 head up | 0.88 | 595 |
-| B7 no movement | 0.89 | 3,353 |
-
-Val Accuracy: 83.35% | F1-macro: 0.7202 | F1-micro: 0.8335 | **F1-mean: 0.7769**
+| B1 | Nodding | 0.66 |
+| B2 | Shaking head | 0.59 |
+| B3 | Turning head | 0.50 |
+| B4 | Tilting head | 0.69 |
+| B5 | Bowing head | 0.84 |
+| B6 | Head up | 0.88 |
+| B7 | No movement | 0.89 |
 
 ---
 
-### Track 2 — Hand Recognition (C/E/F/G)
+## Track 2 — Hand Recognition (C/E/F/G)
 
-All runs use MMN model, 5 classes, aug=STCA, lr=1e-4, batch=32, 80 epochs.
+**Input:** COCO 17-joint skeleton keypoints (x,y)  
+**Model:** MMN (Motion-guided Modulation Network), 5 coarse classes  
+**Best ensemble:** `outputs/hand_skeleton_full/` (joint) + `outputs/hand_full_bone_aug/` (bone)
 
 | Run | Joints | Modality | Aug | F1-mean |
 |---|---|---|---|---|
 | v1 full | 17 | joint | ❌ | 0.7238 |
 | v1 arm | 6 | joint | ❌ | 0.7145 |
 | v2 full | 17 | joint | ✅ | 0.6969 |
-| v2 arm | 6 | joint | ✅ | 0.7084 |
 | bone full | 17 | bone | ✅ | **0.7337** |
 | bone arm | 6 | bone | ✅ | 0.7038 |
-| bone full 120ep | 17 | bone | ✅ | 0.7221 |
-| joint full 120ep | 17 | joint | ✅ | 0.7197 |
 | **Ensemble J+B** | 17 | joint+bone | — | **0.7533** |
 
-**Key findings:**
-- Bone modality beats joint (+0.01)
-- Ensemble J+B gives free +0.02 boost
-- 120 epochs hurts — model overfits after 80
-- Best single model: `outputs/hand_full_bone_aug/best_model.pt`
-- Best ensemble: joint(0.65) + bone(0.35)
+**Ensemble weights:** joint=0.65, bone=0.35  
+**Per-class ensemble:** C=0.68, E=0.55, F=0.78, G=0.63, no-hand=0.89
+
+### Track 2b — Fine-grained Hand Recognition (34 classes)
+
+**Input:** Full-frame RGB (16 frames) + Skeleton keypoints  
+**Model:** Late fusion — frozen VideoMAE-SSv2 + MMN skeleton branch  
+**Classes:** C1–C13, E1–E6, F1–F10, G1–G4, no-hand  
+**Best model:** `outputs/hand_fine_fusion/best_model.pt`
+
+| Experiment | Input | F1-mean |
+|---|---|---|
+| Full frame | 900×1080 → 224×224 | **0.3066** |
+| Upper body crop | nose-to-hips → 224×224 | ⏳ running |
 
 ---
 
-### Track 3 — Leg Recognition (D1–D8)
+## Track 3 — Leg Recognition (D1–D8)
 
-All runs use MMN model, 9 classes, lr=1e-4, batch=32, 80 epochs.
+**Input:** 6 leg joints (hips+knees+ankles), COCO indices [11,12,13,14,15,16]  
+**Model:** MMN joint modality  
+**Best model:** `outputs/leg_skeleton_leg/best_model.pt`
 
 | Run | Joints | Modality | Aug | F1-mean |
 |---|---|---|---|---|
 | leg joints | 6 | joint | ✅ | **0.5733** |
 | leg joints | 6 | joint | ❌ | 0.5138 |
 | full body | 17 | joint | ✅ | 0.5076 |
-| full body | 17 | joint | ❌ | 0.4092 |
-| leg joints | 6 | bone | ✅ | 0.5019 |
 | full body | 17 | bone | ✅ | 0.5261 |
+| leg joints | 6 | bone | ✅ | 0.5019 |
+| **1× cap retrain** | 6 | joint | ✅ | ⏳ running |
 
-**Key findings:**
-- Leg-only joints (hips+knees+ankles) beats full body (+0.07)
-- Augmentation always helps
-- Bone modality hurts for leg (unlike hand)
-- Skeleton ceiling ~0.57 — RGB model needed to push further
-- Best model: `outputs/leg_leg_joint/best_model.pt`
+**Note:** Skeleton ceiling ~0.57. Val set heavily imbalanced (87% no-leg).
 
 ---
 
-### Track 4 — Body Recognition (A1–A5)
+## Track 4 — Body Recognition (A1–A5)
 
-All runs use MMN model, 6 classes, lr=1e-4, batch=32, 80 epochs.
+**Input:** All 17 COCO joints  
+**Model:** MMN joint modality  
+**Best model:** `outputs/body_skeleton_full/best_model.pt`
 
 | Run | Joints | Modality | Aug | F1-mean |
 |---|---|---|---|---|
 | full 17 | 17 | joint | ✅ | **0.6234** |
 | full 17 | 17 | joint | ❌ | 0.5722 |
 | torso 4 | 4 | joint | ✅ | 0.6013 |
-| torso 4 | 4 | joint | ❌ | 0.5557 |
 | full 17 | 17 | bone | ✅ | 0.5544 |
-| torso 4 | 4 | bone | ✅ | 0.5163 |
+| **1× cap retrain** | 17 | joint | ✅ | ⏳ running |
 
-**Key findings:**
-- Full 17 joints beats torso-only
-- Augmentation always helps (+0.05)
-- Bone modality hurts for body (unlike hand)
-- A3 (20 samples) and A4 (9 samples) always F1=0.0 — data scarcity
-- Skeleton ceiling ~0.62 — RGB model needed to push further
-- Best model: `outputs/body_full_joint/best_model.pt`
+**Note:** A3 (20 samples) and A4 (9 samples) always F1=0.0 due to data scarcity.  
+Val set heavily imbalanced (94% no-body).
 
 ---
 
 ## Architecture
 
-### Head track — VideoMAE
+### Head Track — VideoMAE
 - Pretrained: VideoMAE-base fine-tuned on Something-Something-v2
-- Input: 224×224 head+neck crop, 16 frames uniformly sampled
-- Head: linear classifier → 7 classes
-- Training: AdamW, cosine LR, weighted cross-entropy
+- Input: 224×224 head crop, 16 frames
+- Head: Linear classifier → 7 classes
+- Training: AdamW, cosine LR schedule, weighted cross-entropy
 
-### Skeleton tracks — MMN (Motion-guided Modulation Network)
-- Paper: Gu et al., ACM MM 2025
-- Input: 17-joint COCO keypoints from YOLOv8x-pose
+### Skeleton Tracks — MMN
+- Paper: [Gu et al., Motion Matters, ACM MM 2025](https://arxiv.org/abs/2507.21977)
+- Pose extraction: YOLOv8x-pose (COCO 17 joints)
 - Two modalities:
-  - **Joint (J)**: x,y coordinates → shape `(2, T, V, 1)`
-  - **Bone (B)**: dx,dy,distance between connected joints → shape `(3, T, E, 1)`
-- Ensemble: average logits of J and B models (2S strategy from paper)
+  - **Joint (J):** x,y coordinates → `(2, T, V, 1)`
+  - **Bone (B):** dx,dy,length between connected joints → `(3, T, E, 1)`
+- Ensemble: weighted average of J and B logits
 - Training: AdamW lr=1e-4, weight_decay=0.1, batch=32, 80 epochs
 - LR schedule: 20-epoch linear warmup + cosine annealing (3 cycles)
-- Augmentation: STCA (skeletal rotation ±15°, scale 0.9-1.1, translate ±0.1, temporal jitter ±3)
+- Augmentation (STCA): rotation ±15°, scale 0.9–1.1, translate ±0.1, temporal jitter ±3
 
-### Joint subsets per track
-| Mode | Joints | Count |
-|---|---|---|
-| full | all COCO joints | 17 |
-| arm | shoulders+elbows+wrists (5,6,7,8,9,10) | 6 |
-| leg | hips+knees+ankles (11,12,13,14,15,16) | 6 |
-| torso | shoulders+hips (5,6,11,12) | 4 |
+### Hand Fine-grained — Late Fusion
+- RGB branch: VideoMAE-SSv2 (frozen) → mean-pool patches → Linear(768→512)
+- Skeleton branch: MMN (17 joints) → replace head with Identity → Linear(96→256)
+- Fusion: concat(512+256) → Linear(768→256) → Linear(256→34)
+- Only 2.1% of parameters trainable (skeleton branch + fusion MLP)
+- VRAM: ~1.2GB at batch=16
 
 ---
 
-## Key Findings Summary
+## Key Findings
 
-| Finding | Details |
+| Finding | Detail |
 |---|---|
 | Augmentation always helps | STCA gives +0.05 avg across all tracks |
-| Focused joints > full body for leg | 6 leg joints >> 17 joints (+0.07) |
-| Full body > focused for body | 17 joints > 4 torso joints |
+| Focused joints beat full body for leg | 6 leg joints > 17 joints (+0.07) |
+| Full body beats focused for body | 17 joints > 4 torso joints |
 | Bone modality only helps hand | Hurts leg and body tracks |
 | Ensemble J+B free boost | +0.02 for hand without retraining |
 | 80 epochs optimal | 120 epochs causes overfitting |
-| Skeleton ceiling exists | Leg ~0.57, Body ~0.62 — need RGB model |
-
----
-
-## Pipeline
-
-```
-Raw RGB videos (MA-52)
-        │
-        ▼
-YOLOv8x-pose (per frame)
-        │
-        ├─────────────────────────────────┐
-        ▼                                 ▼
-Skeleton keypoints (.json)        Bounding boxes
-        │                          (head, hands, feet)
-        │                                 │
-        ▼                                 ▼
-MMN model (3 tracks)            Head crop 224×224
-  ├── Hand → C/E/F/G/no-hand           │
-  ├── Leg  → D1-D8/no-leg             ▼
-  └── Body → A1-A5/no-body    VideoMAE fine-tuning
-        │                              │
-        │                              ▼
-        │                       B1–B7 prediction
-        │                              │
-        └──────────── Label Fusion ────┘
-                            │
-                            ▼
-              Final 52-class prediction
-```
+| Val imbalance limits skeleton models | 94% no-body, 87% no-leg in val set |
+| VideoMAE dominates head track | RGB crop outperforms skeleton significantly |
 
 ---
 
@@ -225,110 +194,100 @@ MMN model (3 tracks)            Head crop 224×224
 
 ```
 ma52/
-├── data/                          # gitignored
-│   ├── annotations/
-│   ├── videos/
-│   ├── keypoints/
-│   │   ├── train/                 # 11,250 JSON files
-│   │   └── val/                   # 5,586 JSON files
-│   ├── head_crops/
-│   ├── head_crops_dynamic/
-│   ├── head_dataset/
-│   └── skeleton_dataset/
-│       ├── hand_train.csv / hand_val.csv
-│       ├── leg_train.csv  / leg_val.csv
-│       └── body_train.csv / body_val.csv
 ├── src/
 │   ├── extraction/
-│   │   └── extract_pose.py
+│   │   └── extract_pose.py          # YOLOv8x-pose keypoint extraction
 │   ├── head/
-│   │   ├── prepare_dataset.py
-│   │   ├── crop_clips.py
-│   │   ├── train.py
-│   │   ├── evaluate.py
-│   │   └── animate_wrong.py
-│   └── skeleton/
-│       ├── prepare_dataset.py       # Hand 5-class
-│       ├── prepare_leg_dataset.py   # Leg 9-class
-│       ├── prepare_body_dataset.py  # Body 6-class
-│       ├── features.py              # Joint modality loader
-│       ├── features_modality.py     # Joint + Bone modality loader
-│       ├── train_mmn.py             # Hand v1
-│       ├── train_mmn_v2.py          # Hand v2 (paper hyperparams)
-│       ├── train_mmn_generic.py     # Generic v1
-│       ├── train_mmn_generic_v2.py  # Generic v2 (bone + aug flag)
-│       ├── evaluate_skeleton.py     # Ensemble + threshold tuning
-│       └── MMN/                     # MMN repo
-├── jobs/                          # SLURM batch scripts
-├── models/                        # gitignored
-│   ├── videomae-ssv2/
-│   ├── videomae-kinetics/
-│   ├── timesformer/
-│   └── yolov8x-pose.pt
-├── outputs/                       # gitignored except evaluation
-│   ├── head_best_run1/
-│   ├── hand_full_bone_aug/        # Best hand single model
-│   ├── hand_skeleton_full/        # Best hand joint model
-│   ├── leg_leg_joint/             # Best leg model
-│   └── body_full_joint/           # Best body model
+│   │   ├── prepare_dataset.py       # Build head crop CSVs
+│   │   ├── crop_clips.py            # Extract head crop videos
+│   │   ├── train.py                 # VideoMAE fine-tuning
+│   │   ├── evaluate.py              # Confusion matrix + wrong clips
+│   │   └── animate_wrong.py        # Annotated wrong prediction videos
+│   ├── skeleton/
+│   │   ├── prepare_dataset.py       # Hand 5-class CSV
+│   │   ├── prepare_leg_dataset.py   # Leg 9-class CSV
+│   │   ├── prepare_body_dataset.py  # Body 6-class CSV
+│   │   ├── features_modality.py     # Joint + Bone modality loader
+│   │   ├── train_mmn_generic_v2.py  # Main MMN training script
+│   │   ├── evaluate_skeleton.py     # Ensemble + threshold tuning
+│   │   ├── evaluate_body_leg.py     # Confusion matrix for body/leg
+│   │   ├── animate_wrong_body_leg.py # Skeleton overlay wrong videos
+│   │   └── MMN/                     # MMN model (Gu et al. 2025)
+│   └── hand_fine/
+│       ├── prepare_hand_fine_dataset.py  # 34-class hand CSV
+│       ├── hand_fine_dataset.py          # Dual-modal dataset loader
+│       ├── hand_fine_model.py            # VideoMAE + MMN fusion model
+│       ├── train_hand_fine.py            # Full frame training
+│       ├── train_hand_fine_crop.py       # Upper body crop training
+│       └── crop_upperbody.py             # Upper body crop extraction
+├── jobs/                            # SLURM batch scripts
+├── outputs/                         # Model checkpoints + evaluation
+│   ├── head_best_run1/              # Head VideoMAE (F1=0.7769)
+│   ├── hand_skeleton_full/          # Hand MMN joint (F1=0.7238)
+│   ├── hand_full_bone_aug/          # Hand MMN bone (F1=0.7337)
+│   ├── leg_skeleton_leg/            # Leg MMN (F1=0.5733)
+│   ├── body_skeleton_full/          # Body MMN (F1=0.6234)
+│   ├── hand_fine_fusion/            # Hand fine fusion (F1=0.3066)
+│   ├── eval_body/                   # Body confusion matrix + wrong clips
+│   └── eval_leg/                    # Leg confusion matrix + wrong clips
+├── data/                            # gitignored — download separately
+├── models/                          # gitignored — download separately
 ├── README.md
-├── .gitignore
-└── requirements.txt
+├── requirements.txt
+└── .gitignore
 ```
 
 ---
 
 ## Setup
 
-### Requirements
 ```bash
 conda create -n ma52 python=3.12
 conda activate ma52
 pip install torch torchvision
 pip install ultralytics opencv-python-headless
-pip install transformers accelerate
-pip install timm
+pip install transformers accelerate timm
 pip install scikit-learn pandas numpy tqdm
 pip install matplotlib seaborn
 pip install decord av
-pip install huggingface_hub
 ```
 
-### Pose extraction
+## Reproduce Results
+
+### 1. Pose Extraction
 ```bash
 sbatch.tinygpu jobs/job_extract_pose.sh
 ```
 
-### Head track
+### 2. Head Track
 ```bash
 python src/head/prepare_dataset.py
+sbatch.tinygpu jobs/job_crop_head.sh
 sbatch.tinygpu jobs/job_train_head.sh
-sbatch.tinygpu jobs/job_evaluate_head.sh
 ```
 
-### Skeleton tracks
+### 3. Hand Track (Skeleton)
 ```bash
 python src/skeleton/prepare_dataset.py
-python src/skeleton/prepare_leg_dataset.py
-python src/skeleton/prepare_body_dataset.py
-
-# Hand
-sbatch.tinygpu jobs/job_hand_skeleton_full.sh
-sbatch.tinygpu jobs/job_hand_skeleton_full_v2.sh
-
-# Leg
-sbatch.tinygpu jobs/job_leg_full.sh
-sbatch.tinygpu jobs/job_leg_leg_noaug.sh
-
-# Body
-sbatch.tinygpu jobs/job_body_full.sh
-sbatch.tinygpu jobs/job_body_full_noaug.sh
+sbatch.tinygpu jobs/job_hand_skeleton_full.sh   # joint
+sbatch.tinygpu jobs/job_hand_full_bone.sh        # bone
 ```
 
-### Ensemble evaluation
+### 4. Leg Track
+```bash
+python src/skeleton/prepare_leg_dataset.py
+sbatch.tinygpu jobs/job_leg_leg.sh
+```
+
+### 5. Body Track
+```bash
+python src/skeleton/prepare_body_dataset.py
+sbatch.tinygpu jobs/job_body_full.sh
+```
+
+### 6. Hand Ensemble Evaluation
 ```bash
 PYTHON=/home/woody/iwso/iwso226h/conda/envs/ma52/bin/python
-
 $PYTHON src/skeleton/evaluate_skeleton.py \
     --track hand --mode full --num_classes 5 \
     --ensemble \
@@ -337,13 +296,19 @@ $PYTHON src/skeleton/evaluate_skeleton.py \
     --tune_threshold
 ```
 
+### 7. Fine-grained Hand (34 classes)
+```bash
+python src/hand_fine/prepare_hand_fine_dataset.py
+sbatch.tinygpu jobs/job_hand_fine_fusion.sh       # full frame
+sbatch.tinygpu jobs/job_hand_fine_upperbody.sh    # upper body crop
+```
+
 ---
 
 ## References
 
-- **MA-52**: Guo et al., *Benchmarking Micro-action Recognition*, IEEE TCSVT 2024
-- **MAC 2026**: ACM MM 2026 baseline F1-mean 65.64 (Video Swin Transformer)
-- **MMN**: Gu et al., *Motion Matters: Motion-guided Modulation Network*, ACM MM 2025
-- **VideoMAE**: Wang et al., *VideoMAE V2*, CVPR 2023
-- **YOLOv8-pose**: Ultralytics, 2023
-- **BlockGCN**: Zhou et al., *Redefine Topology Awareness*, CVPR 2024 (planned)
+- **MA-52 Dataset:** Guo et al., *Benchmarking Micro-action Recognition*, IEEE TCSVT 2024
+- **MAC 2026:** ACM MM 2026 Grand Challenge
+- **MMN:** Gu et al., *Motion Matters: Motion-guided Modulation Network for Skeleton-based Micro-action Recognition*, ACM MM 2025
+- **VideoMAE:** Wang et al., *VideoMAE V2: Scaling Video Masked Autoencoders*, CVPR 2023
+- **YOLOv8-pose:** Ultralytics, 2023
