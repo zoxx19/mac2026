@@ -1,0 +1,36 @@
+# Data — too large for git
+data/
+
+# Pretrained models
+models/
+
+# Output checkpoints (keep evaluation results)
+outputs/**/*.pt
+outputs/**/*.pth
+outputs/**/checkpoint-*/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Logs (keep if you want history, otherwise ignore)
+logs/
+
+# System
+.DS_Store
+*.tmp
+*.swp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Keep these in outputs (evaluation results)
+!outputs/**/evaluation/
+!outputs/**/confusion_matrix.png
+!outputs/**/wrong_predictions.csv
+!outputs/**/training_log.csv

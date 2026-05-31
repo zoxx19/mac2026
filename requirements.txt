@@ -1,0 +1,16 @@
+torch
+torchvision
+ultralytics
+opencv-python-headless
+transformers
+accelerate
+timm
+scikit-learn
+pandas
+numpy
+tqdm
+matplotlib
+seaborn
+decord
+av
+huggingface_hub
