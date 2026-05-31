@@ -10,12 +10,15 @@
 PYTHON=/home/woody/iwso/iwso226h/conda/envs/ma52/bin/python
 cd /home/woody/iwso/iwso226h/ma52
 
-echo "Cropping upper body — train..."
-$PYTHON src/hand_fine/crop_upperbody.py --split train
+# Step 1: crop upper body
+if [ ! -f data/hand_dataset/hand_fine_upperbody_train.csv ]; then
+    echo "Cropping upper body — train..."
+    $PYTHON src/hand_fine/crop_upperbody.py --split train
+    echo "Cropping upper body — val..."
+    $PYTHON src/hand_fine/crop_upperbody.py --split val
+fi
 
-echo "Cropping upper body — val..."
-$PYTHON src/hand_fine/crop_upperbody.py --split val
-
+# Step 2: train on upper body crops (uses crop script)
 $PYTHON src/hand_fine/train_hand_fine_crop.py \
     --videomae_path models/videomae-ssv2 \
     --output_dir    outputs/hand_fine_upperbody \
