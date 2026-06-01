@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=leg_1x
-#SBATCH --output=logs/leg_1x.log
-#SBATCH --error=logs/leg_1x.err
+#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/leg_1x.log
+#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/leg_1x.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=04:00:00
 #SBATCH --ntasks=1
