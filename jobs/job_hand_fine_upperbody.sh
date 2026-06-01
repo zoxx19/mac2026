@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=hand_fine_crop
-#SBATCH --output=logs/hand_fine_upperbody.log
-#SBATCH --error=logs/hand_fine_upperbody.err
+#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/hand_fine_upperbody.log
+#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/hand_fine_upperbody.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
