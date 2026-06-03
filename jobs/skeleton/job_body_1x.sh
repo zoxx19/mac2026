@@ -14,4 +14,4 @@ $PYTHON src/skeleton/train_mmn_generic_v2.py \
     --track body --mode full --num_classes 6 \
     --modality joint --augment \
     --epochs 80 --batch_size 32 --lr 1e-4 \
-    --output_dir outputs/body_1x
+

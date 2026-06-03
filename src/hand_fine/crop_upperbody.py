@@ -22,7 +22,7 @@ import pandas as pd
 import cv2
 from tqdm import tqdm
 
-PAD_TOP    = 40
+PAD_TOP    = 120
 PAD_BOTTOM = 80
 CROP_SIZE  = 224
 
