@@ -68,9 +68,9 @@ class LegFlowDataset(Dataset):
 
     def _augment(self, frames):
         if np.random.random() > 0.5:
-            frames = [np.fliplr(f) for f in frames]
+            frames = [np.fliplr(f).copy() for f in frames]
         if np.random.random() > 0.8:
-            frames = frames[::-1]
+            frames = [f.copy() for f in reversed(frames)]
         return frames
 
     def __getitem__(self, idx):
