@@ -12,9 +12,9 @@ cd /home/woody/iwso/iwso226h/ma52
 
 $PYTHON src/hand/evaluate_twostage.py \
     --stage1_model outputs/hand_stage1/best_model.pt \
-    --stage2_C     outputs/hand_stage2_C/best_model.pt \
-    --stage2_E     outputs/hand_stage2_E/best_model.pt \
-    --stage2_F     outputs/hand_stage2_F/best_model.pt \
+    --stage2_C     outputs/hand_stage2_C_B/best_model.pt \
+    --stage2_E     outputs/hand_stage2_E_B/best_model.pt \
+    --stage2_F     outputs/hand_stage2_F_B/best_model.pt \
     --stage2_G     outputs/hand_stage2_G/best_model.pt \
     --val_csv      data/hand_dataset/hand_stage1_val.csv \
     --output_dir   outputs/eval_hand_twostage \

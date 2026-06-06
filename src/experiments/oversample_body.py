@@ -52,5 +52,7 @@ print(f"\nOversampled distribution:")
 print(out_df['body_label'].value_counts().sort_index())
 print(f"\nTotal: {len(out_df)} samples")
 
+# Add crop_path column
+out_df['crop_path'] = out_df['video'].apply(lambda v: f"data/body_crops/train/{str(v).replace('.mp4','')}.mp4")
 out_df.to_csv(OUT_CSV, index=False)
 print(f"Saved: {OUT_CSV}")

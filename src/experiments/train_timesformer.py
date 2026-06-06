@@ -44,7 +44,7 @@ import argparse
 from tqdm import tqdm
 import warnings; warnings.filterwarnings("ignore")
 
-NUM_FRAMES = 8   # TimeSformer uses 8 frames by default
+NUM_FRAMES = 16   # TimeSformer uses 8 frames by default
 TRACK_LABELS = {
     'head':        {0:'B1',1:'B2',2:'B3',3:'B4',4:'B5',5:'B6',6:'B7'},
     'body':        {0:'A1',1:'A2',2:'A3',3:'A4',4:'A5',5:'no-body'},
@@ -174,6 +174,7 @@ def main():
     p.add_argument('--stage2_epochs', type=int,   default=20)
     p.add_argument('--lr_stage1',     type=float, default=1e-3)
     p.add_argument('--lr_stage2',     type=float, default=1e-5)
+    p.add_argument('--no_weighted_loss', action='store_true', help='Disable weighted loss')
     p.add_argument('--patience',      type=int,   default=7)
     args = p.parse_args()
 
@@ -202,7 +203,7 @@ def main():
         [len(train_df)/(args.num_classes*counts.get(i,1))
          for i in range(args.num_classes)],
         dtype=torch.float).to(device)
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    criterion = nn.CrossEntropyLoss() if args.no_weighted_loss else nn.CrossEntropyLoss(weight=weights)
 
     train_ds = VideoDataset(args.train_csv, processor, args.video_col,
                             args.label_col, args.img_size, is_train=True)

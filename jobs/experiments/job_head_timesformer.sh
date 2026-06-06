@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#SBATCH --job-name=head_tsf
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/head_timesformer.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/head_timesformer.err
+#SBATCH --job-name=head_tsf2
+#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/head_timesformer2.log
+#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/head_timesformer2.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
@@ -17,12 +17,13 @@ $PYTHON src/experiments/train_timesformer.py \
     --video_col    crop_path \
     --label_col    head_label \
     --num_classes  7 \
-    --output_dir   outputs/head_timesformer \
+    --output_dir   outputs/head_timesformer2 \
     --model_path   models/timesformer-ssv2 \
     --img_size     224 \
     --batch_size   8 \
     --stage1_epochs 10 \
-    --stage2_epochs 20 \
+    --stage2_epochs 10 \
     --lr_stage1    1e-3 \
     --lr_stage2    1e-5 \
-    --patience     7
+    --patience     5 \
+    --no_weighted_loss
