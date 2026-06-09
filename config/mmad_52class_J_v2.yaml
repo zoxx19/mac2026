@@ -1,0 +1,79 @@
+seed: 42
+num_worker: 4
+work_dir: /home/YOUR_USERNAME/repos/Micro-Action/Micro-action skeleton/MMN/work_dir/retrain/mmad_52class_J_v2
+
+phase: train
+
+feeder: src.feeder_mmad_52class.Feeder
+train_feeder_args:
+  split: train
+  keypoint_dir: /path/to/your/storage/track2/skeleton/train
+  ann_csv: "/home/YOUR_USERNAME/repos/Micro-Action/micro_challenge/data/MMA-52/Annotations/train.csv"
+  data_type: j
+  p: 0.5
+  window_size: 32
+  stride: 4
+  overlap_threshold: 0.5
+
+test_feeder_args:
+  split: val
+  keypoint_dir: /path/to/your/storage/track2/skeleton/val
+  ann_csv: "/home/YOUR_USERNAME/repos/Micro-Action/micro_challenge/data/MMA-52/Annotations/val.csv"
+  data_type: j
+  window_size: 32
+  stride: 4
+  overlap_threshold: 0.5
+
+# model
+model: model.MMN.MMN
+model_args:
+  in_channels: 2
+  num_classes: 52
+  num_people: 1
+  num_frames: 32
+  num_points: 17
+  kernel_size: 3
+  num_heads: 4
+  drop: 0.0
+  head_drop: 0.1
+  drop_path: 0.3
+  mlp_ratio: 2.0
+  index_t: True
+
+# optim
+optimizer: AdamW
+weight_decay: 0.1
+lr_scheduler: cosine
+base_lr: 5.0e-4
+min_lr: 1.0e-6
+warmup_lr: 1.0e-6
+warmup_prefix: False
+warm_up_epoch: 10
+
+# training
+device: [0]
+batch_size: 32
+test_batch_size: 32
+num_epoch: 50
+start_epoch: 0
+nesterov: True
+grad_clip: False
+grad_max: 1.0
+
+# loss
+loss_type: ASL
+asl_gamma_neg: 4
+asl_gamma_pos: 0
+
+# logging / checkpointing
+eval_interval: 5
+save_interval: 1
+save_epoch: 1
+log_interval: 100
+print_log: true
+show_topk: [1, 5]
+save_score: true
+overwrite: true
+
+weights: null
+ignore_weights: []

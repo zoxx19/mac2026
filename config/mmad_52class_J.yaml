@@ -1,0 +1,63 @@
+seed: 1
+num_worker: 0
+work_dir: ./work_dir/train/mmad_52class_J
+
+phase: train
+
+feeder: src.feeder_mmad_52class.Feeder
+train_feeder_args:
+  split: 'train'
+  keypoint_dir: '/path/to/your/storage/track2/skeleton/train'
+  ann_csv: '/home/YOUR_USERNAME/repos/Micro-Action/micro_challenge/data/MMA-52/Annotations/train.csv'
+  data_type: 'j'
+  p: 0.2
+  window_size: 32
+  stride: 8
+  overlap_threshold: 0.5
+
+test_feeder_args:
+  split: 'val'
+  keypoint_dir: '/path/to/your/storage/track2/skeleton/val'
+  ann_csv: '/home/YOUR_USERNAME/repos/Micro-Action/micro_challenge/data/MMA-52/Annotations/val.csv'
+  data_type: 'j'
+  window_size: 32
+  stride: 8
+  overlap_threshold: 0.5
+
+# model
+model: model.MMN.MMN
+model_args:
+  in_channels: 2
+  num_classes: 52
+  num_people: 1
+  num_frames: 32
+  num_points: 17
+  kernel_size: 3sbatch "/home/YOUR_USERNAME/repos/Micro-Action/micro_challenge/jobs/train_adatad_body.sh"
+
+  num_heads: 4
+  drop: 0.0
+  head_drop: 0.1
+  drop_path: 0.3
+  mlp_ratio: 2.0
+  index_t: True
+
+# optim
+optimizer: AdamW
+weight_decay: 0.1
+lr_scheduler: cosine
+base_lr: 1e-3
+min_lr: 1e-5
+warmup_lr: 1e-7
+warmup_prefix: False
+warm_up_epoch: 20
+
+# training
+device: [0]
+batch_size: 32
+test_batch_size: 32
+num_epoch: 50
+start_epoch: 0
+nesterov: True
+grad_clip: False
+grad_max: 1.0
+loss_type: BCE

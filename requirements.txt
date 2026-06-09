@@ -1,0 +1,30 @@
+# Core scientific stack
+numpy>=1.23
+pandas>=1.5
+scipy>=1.9
+tqdm>=4.64
+pyyaml>=6.0
+
+# Deep learning (install the CUDA build that matches your driver; CUDA 11.8+ tested)
+torch>=2.0
+torchvision>=0.15
+safetensors>=0.3          # reading HuggingFace VideoMAE weights (convert_videomae_checkpoint.py)
+
+# Video / image IO
+opencv-python>=4.7
+decord>=0.6               # frame decoding used by the AdaTAD e2e pipeline
+einops>=0.6
+
+# OpenMMLab stack — the AdaTAD detector runs inside OpenTAD, which depends on these.
+# Versions below are known-compatible; mmcv must match your torch/CUDA build.
+mmengine>=0.8
+mmcv>=2.0.0
+mmaction2>=1.2.0
+
+# Auxiliary streams (pose / body-crop / skeleton extraction). Optional —
+# only needed to reproduce the skeleton / body experiments, not the main models.
+mediapipe>=0.10
+
+# NOTE: the temporal action detector itself (AdaTAD/ActionFormer) lives in OpenTAD:
+#   https://github.com/sming256/OpenTAD
+# setup.sh clones it and installs it in editable mode.

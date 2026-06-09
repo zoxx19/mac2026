@@ -1,0 +1,71 @@
+# ─────────────────────────── Data (never committed) ───────────────────────────
+# Bare names (no trailing slash) also catch these when they are SYMLINKS — e.g.
+# `data` is a symlink to private cluster storage; a `data/` pattern alone would
+# not match the symlink and would leak its target path on commit.
+data
+data/
+predictions
+predictions/
+checkpoints
+checkpoints/
+work_dirs
+work_dirs/
+pretrained
+pretrained/
+outputs
+outputs/
+
+# Model weights / features / raw media
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.mp4
+*.avi
+*.mov
+*.npy
+*.npz
+*.pkl
+
+# Generated annotation (too large; regenerate with src/data/prepare_augmentation.py)
+**/mma52_augmented_anno.json
+
+# ─────────────────────────────── Logs / runs ──────────────────────────────────
+logs/
+*.log
+wandb/
+runs/
+events.out.tfevents.*
+
+# ──────────────────────── Legacy / cluster-specific jobs ───────────────────────
+# The ad-hoc SLURM scripts below still contain private cluster paths
+# (woody storage, usernames). Only the sanitized templates are tracked.
+jobs/*
+!jobs/train_large1.sh
+!jobs/train_large2.sh
+!jobs/train_dsta.sh
+!jobs/train_asl.sh
+!jobs/infer_val.sh
+!jobs/infer_test.sh
+
+# ─────────────────────────────── Python / env ─────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.ipynb_checkpoints/
+.env
+.venv/
+venv/
+.DS_Store
+
+# NFS lock/temp files (created when a file is deleted while still open)
+.nfs*
+.claude/
+data
+logs/
+*.log
+.claude/
+models/
+outputs/
+data
