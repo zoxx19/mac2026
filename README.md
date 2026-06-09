@@ -13,8 +13,8 @@ End-to-end temporal action detection for the **MAC 2026 Grand Challenge
 Our system fine-tunes a **VideoMAE-Large** video backbone end-to-end with
 lightweight **adapters**, feeds it into an **AdaTAD / ActionFormer** temporal
 detection head, and fuses two complementary models with Soft-NMS. We also
-introduce **DSTA (Dual-path Spatial-Temporal Adapter)**, a new adapter design
-explored as our main architectural contribution.
+implement and extend **DSTA (Dual-path Spatial-Temporal Adapter)** to
+VideoMAE-Large, originally proposed in the MMAD paper (ICCV 2025).
 
 ---
 
@@ -61,7 +61,7 @@ tricks we tried (see [Key Findings](#key-findings) and
  │   VideoMAE-Large ViT  (depth 24, dim 1024, 16 heads, patch 16, no CLS)     │
  │     every block:  Attn → FFN → ┌─ Adapter ─┐                               │
  │                                │  bottleneck (Large1/Large2)               │
- │                                │  ★ DSTA   (our contribution)              │
+ │                                │  ★ DSTA   (extended to VideoMAE-Large)    │
  │                                └───────────┘                               │
  │     backbone weights FROZEN — only adapters train                          │
  │              │  feature map (B, 1024, T, 10, 10)                           │
@@ -92,12 +92,13 @@ tricks we tried (see [Key Findings](#key-findings) and
 > **no CLS token**. This differs from standard ViT assumptions and directly
 > shaped the DSTA implementation.
 
-### DSTA — Dual-path Spatial-Temporal Adapter (novel contribution)
+### DSTA — Dual-path Spatial-Temporal Adapter (extended to VideoMAE-Large)
 
 DSTA was implemented in the final hours of the competition after identifying
-that the gap to #1 was architectural rather than tunable. Inspired by the
-MMAD paper (ICCV 2025) baseline, we extended the dual-path adapter concept
-to VideoMAE-Large (the paper only reported VideoMAE-Base results).
+that the gap to #1 was architectural rather than tunable. Originally
+proposed in the MMAD paper (ICCV 2025), we independently implemented DSTA and
+extended it to VideoMAE-Large — the paper only reported results on
+VideoMAE-Base.
 
 Implementation differences from the paper, discovered by inspecting the actual
 model:
@@ -513,7 +514,7 @@ python src/data/extract_frames.py --split train   # only needed for the image-ba
 ```bash
 sbatch jobs/train_large2.sh     # our strongest single model (vanilla FocalLoss)
 sbatch jobs/train_large1.sh     # weighted-FocalLoss model (the other half of the ensemble)
-sbatch jobs/train_dsta.sh       # ★ DSTA — our novel contribution (warm-starts from Large1)
+sbatch jobs/train_dsta.sh       # ★ DSTA — extended to VideoMAE-Large (warm-starts from Large1)
 ```
 Each job script begins with a `USER CONFIGURATION` block — edit
 `OPENTAD_DIR`, `DATA_DIR`, `CHECKPOINT_DIR`, etc. for your cluster.
@@ -554,7 +555,7 @@ micro_challenge/
 │   ├── adatad/   large1.py large2.py dsta.py asl.py (+ tg.py body.py)
 │   └── base/     mma52_dataset.py            dataset / pipeline config
 ├── src/
-│   ├── models/   dsta_adapter.py (★ novel)   losses.py (Focal + ASL)
+│   ├── models/   dsta_adapter.py (★ DSTA for VideoMAE-Large)   losses.py (Focal + ASL)
 │   ├── data/     prepare_annotations.py  prepare_augmentation.py  extract_frames.py
 │   ├── fusion.py  multi_ensemble.py            ensemble (Soft-NMS / WBF)
 │   ├── prepare_submission.py  prepare_submission_csv.py
@@ -624,8 +625,9 @@ Recommendation for future work: use a held-out mini-test set, or trust the
 leaderboard more than val mAP for final submission decisions.
 
 **Open / novel direction**
-- **DSTA** is, we believe, the right architectural direction (explicit
-  spatial/temporal factorisation in the adapter). Its training was cut short by
+- **DSTA** (extended to VideoMAE-Large) is, we believe, the right architectural
+  direction for this task (explicit spatial/temporal factorisation in the
+  adapter). Its training was cut short by
   the compute budget rather than by a result; see
   [`docs/architecture.md`](docs/architecture.md).
 
