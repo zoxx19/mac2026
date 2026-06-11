@@ -5,12 +5,6 @@ cluster. Intended to save the next team (or future me) days of debugging.
 
 ## Environment Setup Issues
 
-- **The project directory previously had a trailing space — this has been fixed.**
-  A `git clone` now gives you the clean name `micro_challenge` (no space).
-  Historically the trailing space broke bash heredocs and naive shell operations;
-  if you ever encounter a path with a trailing space, quote it
-  (`cd "…/micro_challenge "`) or rename it. Writing files with Python `open()`
-  instead of shell redirection sidesteps the problem entirely.
 - Use the project's conda Python for everything (`conda activate opentad`); the
   OpenMMLab stack (`mmcv` / `mmaction2`) is version-sensitive and must match the
   torch/CUDA build.
@@ -77,8 +71,6 @@ Full numbers in [RESULTS.md](RESULTS.md).
 
 ## Storage Management
 
-- Woody storage quota: **1000 GB** soft / 1500 GB hard. We ran at ~960 GB —
-  keep an eye on it.
 - Each VideoMAE-Large checkpoint is **~3 GB**; keep only the best 2–3 per model.
 - Prediction JSONs are **200–400 MB** each.
 - Strip checkpoints to weights-only (`tools/strip_checkpoint.py`) for archival /
