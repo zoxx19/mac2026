@@ -633,24 +633,6 @@ leaderboard more than val mAP for final submission decisions.
 
 ---
 
-## Citation
-
-If this work is useful, please cite:
-
-```bibtex
-@misc{mac2026_madlab,
-  title  = {MAC 2026 Grand Challenge: Multi-label Micro-Action Detection},
-  author = {Ziad Gaber},
-  note   = {MAD Lab, Friedrich-Alexander-Universität Erlangen-Nürnberg.
-            Track 2: 3rd place, 0.22993 avg mAP.
-            Supervised by Amirreza Asemanrafat.},
-  year   = {2026}
-}
-```
-
-This work builds on **OpenTAD** (AdaTAD / ActionFormer), **VideoMAE**, and
-**MMAction2**. Please cite their original papers as well.
-
 ## Acknowledgements
 
 **[MAD Lab — Machine Learning and Data Analytics Lab](https://www.mad.tf.fau.de/)**  
