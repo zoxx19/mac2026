@@ -34,7 +34,37 @@ Video
 Each track uses whichever model worked best for that signal:
 - **Head & hand fine-grained:** VideoMAE video transformer, fine-tuned on cropped clips
 - **Body & leg:** an ensemble of optical-flow-based VideoMAE and a skeleton graph network (MMN)
-- **Hand coarse routing:** an ensemble of a VideoMAE classifier and two skeleton-based classifiers, which more than doubles routing accuracy over any single model
+- **Hand coarse routing:** an ensemble of a VideoMAE classifier and two skeleton-based classifiers
+
+## What We Tried
+
+We explored a wide range of architectures and training strategies before settling on the final per-track ensembles above.
+
+**Backbones evaluated:** VideoMAE-base (SSv2 and Kinetics pretraining), VideoMAE-large, TimeSformer (base and high-resolution variants), and two skeleton-graph architectures (MMN; CTR-GCN and BlockGCN were prototyped but not integrated due to graph-shape incompatibilities with our joint layout).
+
+**Input representations evaluated:** raw RGB crops at multiple framings (full-body, upper-body, head-only, limb-focused), COCO-17 joint coordinates, bone/limb-vector features, and Farneback optical flow encoded as HSV video.
+
+**Training strategies evaluated:** class-weighted loss vs. focal loss, oversampling of rare classes, MixUp and label smoothing, dropout regularization, dynamic per-frame cropping, single-stage flat classification vs. coarse-to-fine hierarchical classification, and transferring a router model's backbone into the downstream fine-grained classifiers.
+
+**Fusion strategies evaluated:** single best-model per track vs. weighted ensembles of 2–3 models per track, with ensemble weights swept on a held-out validation grid.
+
+We also attempted to train a single end-to-end model over all 52 classes directly (skipping the per-track split entirely), to see whether a unified model could outperform the fusion approach; this was not completed in the time available and is noted as future work below.
+
+## Key Findings
+
+- **Pretraining domain dominated model size.** A base model pretrained on Something-Something-v2 (an action dataset with fine hand/body motion) consistently beat a 3.5x larger model pretrained on Kinetics, across every track. TimeSformer, despite a different attention mechanism, underperformed VideoMAE on every track tried.
+- **RGB and skeleton models fail differently — ensembling them was our single biggest win.** A skeleton-based classifier and an optical-flow RGB classifier disagree on different videos; averaging their predicted probabilities gave the largest improvement of any single change, lifting the leg track by +0.11 F1 and the body track by +0.03 F1 over the better individual model.
+- **Hierarchical classification beat flat classification by a wide margin.** Splitting the 34-class fine-grained hand problem into a coarse router (which limb?) followed by 4 small per-limb classifiers outperformed a single 34-way classifier by roughly +0.17 F1.
+- **Backbone transfer between stages matters for low-data classes.** Initializing a fine-grained classifier from the coarse router's fine-tuned backbone (rather than from the generic pretrained checkpoint) gave a +0.135 F1 jump for the smallest, most data-scarce class group.
+- **Ensembling the routing decision reduced cascading errors.** In the two-stage hand pipeline, an error at the routing step guarantees an error downstream. Replacing a single router with a 3-way ensemble (RGB + two skeleton modalities) raised routing accuracy from 70% to 81%, which alone moved the final hand-track score from 0.41 to 0.48.
+- **More augmentation and more capacity were not free wins.** Stronger augmentation, longer training schedules, and larger models each helped in some configurations but hurt in others (e.g. extending head-track training degraded its F1 from 0.777 to 0.697); every change was validated rather than assumed beneficial.
+- **Validation-set tuning does not guarantee held-out generalization.** Our held-out validation score (0.578) was noticeably higher than what we observed on a separate, unseen test split (0.45). We attribute this gap to ensemble weights and class-balancing ratios being tuned against the same validation set used for final evaluation — a useful reminder that tuning and final evaluation splits should ideally be kept separate.
+
+## Limitations & Future Work
+
+- The fine-grained hand track (34 classes) remains the weakest link (F1 ≈ 0.48); more training data per class or a stronger backbone (e.g. a larger video transformer than fits on a single 10GB GPU) would likely help most here.
+- A single unified 52-class end-to-end model was prototyped but not completed; comparing it properly against the per-track fusion approach is the natural next experiment.
+- Tuning ensemble weights via cross-validation rather than a single validation split would likely close some of the validation/test generalization gap noted above.
 
 ## Project Structure
 
@@ -106,14 +136,6 @@ sbatch jobs/experiments/job_ensemble_leg.sh
 # Final fusion across all tracks
 sbatch jobs/fusion/job_label_fusion.sh
 ```
-
-## Key Findings
-
-- Pretraining domain matters more than model size: a base model pretrained on Something-Something-v2 consistently beat a larger model pretrained on Kinetics.
-- A skeleton-based model and an RGB model make different mistakes; ensembling the two gave the largest single improvement on body and leg.
-- Hierarchical (coarse-then-fine) classification clearly outperformed a single flat 34-class classifier for the hand track.
-- Initializing the fine-grained classifier from the coarse router's weights, rather than from the base pretrained checkpoint, gave a large boost for low-data classes.
-- Ensembling multiple models for the routing decision (rather than relying on one) substantially reduced downstream errors in the two-stage pipeline.
 
 ## References
 
