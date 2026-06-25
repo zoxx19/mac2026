@@ -8,6 +8,7 @@ models/
 outputs/**/*.pt
 outputs/**/*.pth
 outputs/**/checkpoint-*/
+outputs/**/*.mp4
 
 # Python
 __pycache__/
@@ -33,6 +34,4 @@ logs/
 !outputs/**/evaluation/
 !outputs/**/confusion_matrix.png
 !outputs/**/wrong_predictions.csv
-!outputs/**/training_log.csvsrc/skeleton/BlockGCN/
-src/skeleton/CTR-GCN/
-outputs/**/*.mp4
+!outputs/**/training_log.csv
