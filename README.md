@@ -17,6 +17,21 @@ The model classifies 52 fine-grained human micro-actions across 7 coarse body-pa
 
 Metric: `F1_mean = (F1_body_macro + F1_body_micro + F1_action_macro + F1_action_micro) / 4`
 
+
+## Dataset
+
+[MA-52](https://huggingface.co/datasets/kunli-cs/MA-52) contains 22,422 short RGB clips (~2.8s, 30fps) of spontaneous micro-actions recorded during interviews: 11,250 train / 5,586 val / 1,138 test. Each clip is labeled with one of 52 fine-grained actions, which map onto 7 coarse body-part groups:
+
+| Coarse group | Fine labels |
+|---|---|
+| A — body | 0–4 |
+| B — head | 5–10 |
+| C — upper limb | 11–23 |
+| D — lower limb | 24–31 |
+| E — body-hand | 32–37 |
+| F — head-hand | 38–47 |
+| G — leg-hand | 48–51 |
+
 ## Approach
 
 ```
@@ -107,7 +122,7 @@ sbatch jobs/head/job_extract_pose.sh
 
 ## Training
 
-Each track is trained independently. See `jobs/` for ready-to-run SLURM scripts, or call the underlying scripts in `src/` directly.
+Each track is trained independently. See `jobs/` for ready-to-run SLURM scripts (update the `PYTHON=` and `cd` lines at the top of each script to match your environment), or call the underlying scripts in `src/` directly.
 
 ```bash
 # Head
@@ -134,7 +149,7 @@ sbatch jobs/experiments/job_ensemble_body.sh
 sbatch jobs/experiments/job_ensemble_leg.sh
 
 # Final fusion across all tracks
-sbatch jobs/fusion/job_label_fusion.sh
+python src/fusion/label_fusion.py
 ```
 
 ## References
@@ -142,4 +157,4 @@ sbatch jobs/fusion/job_label_fusion.sh
 - Guo et al., *Benchmarking Micro-action Recognition: Dataset, Methods, and Applications*, IEEE TCSVT 2024
 - Gu et al., *Motion Matters: Motion-guided Modulation Network for Skeleton-based Micro-action Recognition*, ACM MM 2025
 - Tong et al., *VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video Pre-Training*, NeurIPS 2022
-- Ultralytics YOLOv8
+- Ultralytics YOLOv8- Ultralytics, *YOLOv8*, 2023
