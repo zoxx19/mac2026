@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=leg_leg
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/leg_leg_%j.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/leg_leg_%j.err
+#SBATCH --output=logs/leg_leg_%j.log
+#SBATCH --error=logs/leg_leg_%j.err
 #SBATCH --time=12:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8

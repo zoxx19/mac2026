@@ -1,4 +1,5 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=eval_body
 #SBATCH --output=logs/eval_body.log
 #SBATCH --error=logs/eval_body.err

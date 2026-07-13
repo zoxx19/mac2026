@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=leg_vmae
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/leg_videomae.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/leg_videomae.err
+#SBATCH --output=logs/leg_videomae.log
+#SBATCH --error=logs/leg_videomae.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1

@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=hs2_G_S
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/hand_stage2_G_ssv2_os.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/hand_stage2_G_ssv2_os.err
+#SBATCH --output=logs/hand_stage2_G_ssv2_os.log
+#SBATCH --error=logs/hand_stage2_G_ssv2_os.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=16:00:00
 #SBATCH --ntasks=1

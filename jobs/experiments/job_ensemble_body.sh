@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=ens_body
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/ensemble_body.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/ensemble_body.err
+#SBATCH --output=logs/ensemble_body.log
+#SBATCH --error=logs/ensemble_body.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=01:00:00
 #SBATCH --ntasks=1

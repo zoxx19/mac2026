@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=ma52_pose
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/pose_%j.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/pose_%j.err
+#SBATCH --output=logs/pose_%j.log
+#SBATCH --error=logs/pose_%j.err
 #SBATCH --time=24:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --export=NONE
@@ -9,7 +10,7 @@
 unset SLURM_EXPORT_ENV
 
 PYTHON=/home/woody/iwso/iwso226h/conda/envs/ma52/bin/python
-export YOLO_CONFIG_DIR=/home/woody/iwso/iwso226h/ultralytics_config
+export YOLO_CONFIG_DIR=$HOME/ultralytics_config
 
 cd /home/woody/iwso/iwso226h/ma52
 

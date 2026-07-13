@@ -1,7 +1,8 @@
 #!/bin/bash -l
+# NOTE: Update the PYTHON= path and cd path below to match your cluster environment.
 #SBATCH --job-name=leg_flow
-#SBATCH --output=/home/woody/iwso/iwso226h/ma52/logs/leg_flow.log
-#SBATCH --error=/home/woody/iwso/iwso226h/ma52/logs/leg_flow.err
+#SBATCH --output=logs/leg_flow.log
+#SBATCH --error=logs/leg_flow.err
 #SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
