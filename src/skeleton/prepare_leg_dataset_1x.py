@@ -25,7 +25,7 @@ import pandas as pd
 from pathlib import Path
 from collections import Counter
 
-DATA_DIR = Path("/home/woody/iwso/iwso226h/ma52/data")
+DATA_DIR = Path("data")
 ANN_DIR  = DATA_DIR / "annotations"
 OUT_DIR  = DATA_DIR / "skeleton_dataset"
 OUT_DIR.mkdir(exist_ok=True)

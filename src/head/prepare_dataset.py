@@ -12,7 +12,7 @@ import random
 random.seed(42)
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-DATA_DIR  = Path("/home/woody/iwso/iwso226h/ma52/data")
+DATA_DIR  = Path("data")
 ANN_DIR   = DATA_DIR / "annotations"
 OUT_DIR   = DATA_DIR / "head_dataset"
 OUT_DIR.mkdir(exist_ok=True)

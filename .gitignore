@@ -35,3 +35,4 @@ logs/
 !outputs/**/confusion_matrix.png
 !outputs/**/wrong_predictions.csv
 !outputs/**/training_log.csv
+__pycache__/

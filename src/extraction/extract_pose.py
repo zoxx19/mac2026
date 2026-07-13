@@ -221,7 +221,7 @@ def main():
 
     random.seed(args.seed)
 
-    model = YOLO("/home/woody/iwso/iwso226h/ma52/models/yolov8x-pose.pt")
+    model = YOLO("models/yolov8x-pose.pt")
 
     video_dir = Path(args.video_dir)
     kp_dir    = Path(args.kp_dir);  kp_dir.mkdir(parents=True, exist_ok=True)

@@ -47,7 +47,7 @@ sys.path.insert(0, str(Path(__file__).parent / "MMN"))
 from model.MMN import MMN_
 from features_modality import extract_features, MODE_JOINTS, MODE_EDGES
 
-BASE     = Path("/home/woody/iwso/iwso226h/ma52")
+BASE     = Path(".")
 DATA_DIR = BASE / "data/skeleton_dataset"
 
 NUM_FRAMES  = 64
